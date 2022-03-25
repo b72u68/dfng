@@ -1,0 +1,160 @@
+Machine code
+
+
+
+ Code 
+ Translation 
+ Compiler 
+ Compile-time 
+ Optimizing compiler 
+ Intermediate representation  (IR) 
+ Execution 
+ Runtime system 
+ Runtime 
+ Executable 
+ Interpreter 
+ Virtual machine Source code 
+ Object code 
+ Bytecode 
+ Machine code 
+ Microcode Just-in-time  (JIT)
+ Tracing just-in-time 
+ Ahead-of-time  (AOT) 
+ Transcompilation 
+ Recompilation Android Runtime  (ART) 
+ Common Language Runtime  (CLR) and  Mono 
+ crt0 
+ Java virtual machine  (JVM) 
+ Objective-C  and  Swift 
+ V8  and  Node.js 
+ CPython  and  PyPy 
+ Zend Engine  (PHP) GNU Compiler Collection  (GCC) 
+ LLVM  and  Clang v t e In  computer programming ,  machine code  is any  low-level programming language , consisting of  machine language   instructions , which are used to control a computer's  central processing unit  (CPU). Each instruction causes the CPU to perform a very specific task, such as a load, a store, a  jump , or an  arithmetic logic unit  (ALU) operation on one or more units of data in the CPU's  registers  or  memory .
+ Machine code is a strictly numerical language which is designed to run as fast as possible, and may be considered as the lowest-level representation of a  compiled  or  assembled  computer program or as a primitive and  hardware -dependent programming language. While it is possible to write programs directly in machine code, managing individual bits and calculating numerical  addresses  and constants manually is tedious and error-prone. For this reason, programs are very rarely written directly in machine code in modern contexts, but may be done for low level  debugging , program  patching  (especially when assembler source is not available) and assembly language  disassembly .
+ The majority of practical programs today are written in  higher-level languages  or assembly language. The source code is then translated to executable machine code by utilities such as  compilers ,  assemblers , and  linkers , with the important exception of  interpreted  programs, [nb 1]  which are not translated into machine code. However, the  interpreter  itself, which may be seen as an executor or processor performing the instructions of the source code, typically consists of directly executable machine code (generated from assembly or high-level language source code).
+ Machine code is by definition the lowest level of programming detail visible to the programmer, but internally many processors use  microcode  or optimise and transform machine code instructions into sequences of  micro-ops . This is not generally considered to be a machine code.
+ Contents 
+ 1   Instruction set 
+ 2   Programs 
+ 3   Assembly languages 
+ 4   Example 
+ 5   Overlapping instructions 
+ 6   Relationship to microcode 
+ 7   Relationship to bytecode 
+ 8   Storing in memory 
+ 9   Readability by humans 
+ 10   See also 
+ 11   Notes 
+ 12   References 
+ 13   Further reading 
+ Instruction set [ edit ] Every processor or processor family has its own  instruction set . Instructions are patterns of  bits , digits or characters that correspond to machine commands. Thus, the instruction set is specific to a class of processors using (mostly) the same architecture. Successor or derivative processor designs often include instructions of a predecessor and may add new additional instructions. Occasionally, a successor design will discontinue or alter the meaning of some instruction code (typically because it is needed for new purposes), affecting code compatibility to some extent; even compatible processors may show slightly different behavior for some instructions, but this is rarely a problem. Systems may also differ in other details, such as memory arrangement, operating systems, or  peripheral devices . Because a program normally relies on such factors, different systems will typically not run the same machine code, even when the same type of processor is used.
+ A processor's instruction set may have all instructions of the same length, or it may have variable-length instructions. How the patterns are organized varies with the particular architecture and type of instruction. Most instructions have one or more  opcode  fields which specifies the basic instruction type (such as arithmetic, logical,  jump , etc.), the operation (such as add or compare), and other fields that may give the type of the  operand (s), the  addressing mode (s), the addressing offset(s) or index, or the operand value itself (such constant operands contained in an instruction are called  immediate ). [1] 
+ Not all machines or individual instructions have explicit operands. An  accumulator machine  has a combined left operand and result in an implicit accumulator for most arithmetic instructions. Other architectures (such as 8086 and the x86-family) have accumulator versions of common instructions, with the accumulator regarded as one of the general registers by longer instructions. A  stack machine  has most or all of its operands on an implicit stack. Special purpose instructions also often lack explicit operands (CPUID in the x86 architecture writes values into four implicit destination registers, for instance). This distinction between explicit and implicit operands is important in code generators, especially in the  register allocation  and live range tracking parts. A good code optimizer can track implicit as well as explicit operands which may allow more frequent  constant propagation ,  constant folding  of registers (a register assigned the result of a constant expression freed up by replacing it by that constant) and other code enhancements.
+ Programs [ edit ] A  computer program  is a list of instructions that can be executed by a  central processing unit  (CPU). A program's execution is done in order for the CPU that is executing it to solve a problem and thus accomplish a result. While simple processors are able to execute instructions one after another,  superscalar  processors are capable of executing many instructions simultaneously.
+ Program flow  may be influenced by special 'jump' instructions that transfer execution to an address (and hence instruction) other than the next numerically sequential address. Whether these  conditional jumps  occur is dependent upon a condition such as a value being greater than, less than, or equal to another value.
+ Assembly languages [ edit ] A much more human friendly rendition of machine language, called  assembly language , uses  mnemonic codes  to refer to machine code instructions, rather than using the instructions' numeric values directly, and uses  symbolic names  to refer to storage locations and sometimes  registers . For example, on the  Zilog Z80  processor, the machine code  00000101 , which causes the CPU to decrement the  B   processor register , would be represented in assembly language as  DEC B .
+ Example [ edit ] The  MIPS architecture  provides a specific example for a machine code whose instructions are always 32 bits long. The general type of instruction is given by the  op  (operation) field, the highest 6 bits. J-type (jump) and I-type (immediate) instructions are fully specified by  op . R-type (register) instructions include an additional field  funct  to determine the exact operation. The fields used in these types are:
+ rs ,  rt , and  rd  indicate register operands;  shamt  gives a shift amount; and the  address  or  immediate  fields contain an operand directly.
+ For example, adding the registers 1 and 2 and placing the result in register 6 is encoded:
+ Load a value into register 8, taken from the memory cell 68 cells after the location listed in register 3:
+ Jumping to the address 1024:
+ Overlapping instructions [ edit ] On processor architectures with  variable-length instruction sets [2]  (such as  Intel 's  x86  processor family) it is, within the limits of the control-flow resynchronizing phenomenon known as the  Kruskal Count , [3] [2]  sometimes possible through opcode-level programming to deliberately arrange the resulting code so that two code paths share a common fragment of opcode sequences. These are called  overlapping instructions ,  overlapping opcodes ,  overlapping code ,  overlapped code ,  instruction scission , or  jump into the middle of an instruction , and represent a form of superposition. [4] [5] [6] 
+ In the 1970s and 1980s, overlapping instructions were sometimes used to preserve memory space. One example were in the implementation of error tables in  Microsoft 's  Altair BASIC , where  interleaved instructions  mutually shared their instruction bytes. [7] [2] [4]  The technique is rarely used today, but might still be necessary to resort to in areas where extreme optimization for size is necessary on byte-level such as in the implementation of  boot loaders  which have to fit into  boot sectors . [nb 2] 
+ It is also sometimes used as a  code obfuscation  technique as a measure against  disassembly  and tampering. [2] 
+ The principle is also utilized in shared code sequences of  fat binaries  which must run on multiple instruction-set-incompatible processor platforms.
+ This property is also used to find  unintended instructions  called  gadgets  in existing code repositories and is utilized in  return-oriented programming  as alternative to  code injection  for exploits such as  return-to-libc attacks . [8] [2] 
+ Relationship to microcode [ edit ] In some  computer architectures , the machine code is implemented by an even more fundamental underlying layer called  microcode , providing a common machine language interface across a line or family of different models of computer with widely different underlying  dataflows . This is done to facilitate  porting  of machine language programs between different models. An example of this use is the IBM  System/360  family of computers and their successors. With dataflow path widths of 8 bits to 64 bits and beyond, they nevertheless present a common architecture at the machine language level across the entire line.
+ Using microcode to implement an  emulator  enables the computer to present the architecture of an entirely different computer. The System/360 line used this to allow porting programs from earlier IBM machines to the new family of computers, e.g. an  IBM 1401/1440/1460  emulator on the IBM S/360 model 40.
+ Relationship to bytecode [ edit ] Machine code is generally different from  bytecode  (also known as p-code), which is either executed by an interpreter or itself compiled into machine code for faster (direct) execution. An exception is when a processor is designed to use a particular bytecode directly as its machine code, such as is the case with  Java processors .
+ Machine code and assembly code are sometimes called  native  code  when referring to platform-dependent parts of language features or libraries. [9] 
+ Storing in memory [ edit ] The  Harvard architecture  is a computer architecture with physically separate storage and signal pathways for the code (instructions) and  data . Today, most processors implement such separate signal pathways for performance reasons but implement a  Modified Harvard architecture , [ citation needed ]  so they can support tasks like loading an  executable  program from  disk storage  as data and then executing it. Harvard architecture is contrasted to the  Von Neumann architecture , where data and code are stored in the same memory which is read by the processor allowing the computer to execute commands.
+ From the point of view of a  process , the  code space  is the part of its  address space  where the code in execution is stored. In  multitasking  systems this comprises the program's  code segment  and usually  shared libraries . In  multi-threading  environment, different threads of one process share code space along with data space, which reduces the overhead of  context switching  considerably as compared to process switching.
+ Readability by humans [ edit ] Pamela Samuelson wrote that machine code is so unreadable that the  United States Copyright Office  cannot identify whether a particular encoded program is an original work of authorship; [10]  however, the US Copyright Office  does  allow for copyright registration of computer programs [11]  and a program's machine code can sometimes be  decompiled  in order to make its functioning more easily understandable to humans. [12]  However, the output of a decompiler or disassembler will be missing the comments and symbolic references, so while the output may be easier to read than the object code, it will still be more difficult than the original source code. This problem does not exist for object-code formats like  SQUOZE , where the source code is included in the file.
+ Cognitive science professor  Douglas Hofstadter  has compared machine code to  genetic code , saying that "Looking at a program written in machine language is vaguely comparable to looking at a  DNA  molecule atom by atom." [13] 
+ See also [ edit ] Assembly language 
+ Endianness 
+ List of machine languages 
+ Machine code monitor 
+ Overhead code 
+ P-code machine 
+ Reduced instruction set computing  (RISC) 
+ Very long instruction word 
+ Teaching Machine Code:  Micro-Professor MPF-I Notes [ edit ] References [ edit ] Further reading [ edit ] Hennessy, John L. ;  Patterson, David A.  (1994).  Computer Organization and Design. The Hardware/Software Interface .  Morgan Kaufmann Publishers .  ISBN   1-55860-281-X . 
+ Tanenbaum, Andrew S.  (1999).  Structured Computer Organization .  Prentice Hall .  ISBN   0-13-020435-8 . 
+ Brookshear, J. Glenn (2007).  Computer Science: An Overview .  Addison Wesley .  ISBN   978-0-321-38701-1 . v t e Alignment 
+ Calling convention 
+ Call stack 
+ Library 
+ static 
+ Machine code 
+ Memory segmentation 
+ Name mangling 
+ Object code 
+ Opaque pointer 
+ Position-independent code 
+ Relocation 
+ System call 
+ Virtual method table Binary-code compatibility 
+ Foreign function interface 
+ Language binding 
+ Linker 
+ dynamic 
+ Loader 
+ Year 2038 problem v t e Actor-based 
+ Array 
+ Aspect-oriented 
+ Class-based 
+ Concatenative 
+ Concurrent 
+ Dataflow 
+ Declarative 
+ Differentiable 
+ Domain-specific 
+ Dynamic 
+ Esoteric 
+ Event-driven 
+ Extensible 
+ Functional 
+ Imperative 
+ Logic 
+ Macro 
+ Metaprogramming 
+ Object-based 
+ Object-oriented 
+ Pipeline 
+ Procedural 
+ Prototype-based 
+ Reflective 
+ Rule-based 
+ Scripting 
+ Stack-oriented 
+ Synchronous 
+ Tactile 
+ Template Assembly 
+ Compiled 
+ Interpreted 
+ Machine Low-level 
+ High-level 
+ Very high-level First 
+ Second 
+ Third 
+ Fourth 
+ Fifth Non-English-based 
+ Visual Germany Machine code Assembly languages Low-level programming languages Articles with short description Short description matches Wikidata Use dmy dates from December 2021 Use list-defined references from December 2021 All articles with unsourced statements Articles with unsourced statements from March 2014 Articles with GND identifiers Navigation menu Not logged in Talk Contributions Create account Log in Article Talk Read Edit View history 
+				 Search 
+			 Main page Contents Current events Random article About Wikipedia Contact us Donate Help Learn to edit Community portal Recent changes Upload file What links here Related changes Upload file Special pages Permanent link Page information Cite this page Wikidata item Download as PDF Printable version العربية Azərbaycanca বাংলা Bân-lâm-gú Беларуская Български Bosanski Brezhoneg Català Čeština Cymraeg Dansk Deutsch Eesti Ελληνικά Español Esperanto Euskara فارسی Français Galego 한국어 Հայերեն हिन्दी Hornjoserbsce Hrvatski Bahasa Indonesia Íslenska Italiano עברית ქართული Қазақша Кыргызча Latviešu Lietuvių La .lojban. Lombard Magyar മലയാളം Bahasa Melayu Mirandés Монгол မြန်မာဘာသာ Nederlands 日本語 Norsk bokmål Norsk nynorsk Олык марий Oʻzbekcha/ўзбекча Polski Português Română Русский Simple English Slovenčina Slovenščina کوردی Српски / srpski Srpskohrvatski / српскохрватски Suomi Svenska Tagalog ไทย Türkçe Українська اردو Tiếng Việt 吴语 粵語 中文 
+	  This page was last edited on 21 March 2022, at 15:10  (UTC) . 
+	 Text is available under the  Creative Commons Attribution-ShareAlike License 3.0 ;
+additional terms may apply.  By using this site, you agree to the  Terms of Use  and  Privacy Policy . Wikipedia® is a registered trademark of the  Wikimedia Foundation, Inc. , a non-profit organization. 
+ 
+	 Privacy policy 
+	 About Wikipedia 
+	 Disclaimers 
+	 Contact Wikipedia 
+	 Mobile view 
+	 Developers 
+	 Statistics 
+	 Cookie statement 
+ 
+	 
+	 
