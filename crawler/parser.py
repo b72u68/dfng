@@ -1,24 +1,22 @@
 import os
+import json
 from scrapy.selector import Selector
 
-TITLE_NODES = ['//h1//text()']
-BODY_NODES = ['//p//text()', '//ul//text()', '//h2//text()', '//h3//text()',
-              '//h4//text()', '//h5//text()']
+BODY_NODES = ['//p//text()', '//ul//text()', '//h2//text()', '//h1//text()',
+              '//h3//text()', '//h4//text()', '//h5//text()']
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
-HTML_DIR = os.path.join(CURRENT_DIR, "html")
-DOC_DIR = os.path.join(CURRENT_DIR, "docs")
-
-if not os.path.isdir(DOC_DIR):
-    print(f"\nparser: creating docs directory {DOC_DIR}.")
-    os.mkdir(DOC_DIR)
+ROOT_DIR = os.path.dirname(CURRENT_DIR)
+DATA_DIR = os.path.join(ROOT_DIR, "data")
+CORPUS_METADATA = os.path.join(DATA_DIR, "corpus.json")
+CORPUS_DIR = os.path.join(DATA_DIR, "docs")
 
 
 def parse(filename):
     try:
         file = open(filename)
         selector = Selector(text=file.read())
-        title = selector.xpath('|'.join(TITLE_NODES)).get()
+        title = selector.xpath('//title//text()').get()
         body = ' '.join(selector.xpath('|'.join(BODY_NODES)).getall())
         file.close()
         return title, body
@@ -27,28 +25,49 @@ def parse(filename):
         return None, None
 
 
-def write_doc(filename, text):
-    docfile = os.path.join(DOC_DIR, filename)
-    with open(docfile, 'w') as f:
+def write(filename, text):
+    with open(filename, "w") as f:
         f.write(text)
         f.close()
 
 
 if __name__ == "__main__":
-    for file in os.listdir(HTML_DIR):
-        htmlfile = os.path.join(HTML_DIR, file)
 
-        if not os.path.isfile(htmlfile):
-            continue
+    corpus_metadata = []
 
-        docfile = '.'.join(file.split(".")[:-1]) + ".txt"
+    if not os.path.isfile(CORPUS_METADATA):
+        print("\nparser: cannot find corpus metadata file.")
+        exit(1)
 
-        print(f"\nparser: parsing {htmlfile}.")
-        title, body = parse(htmlfile)
+    with open(CORPUS_METADATA, "r") as f:
+        documents = json.load(f)
+        for document in documents:
+            htmlfile = document['htmlfile']
 
-        if title and body:
-            text = f'{title}\n\n{body}'
-            print(f"parser: writing document {docfile}.")
-            write_doc(docfile, text)
-        else:
-            print(f"parser: cannot parse {htmlfile}.")
+            if not os.path.isfile(htmlfile):
+                print(f"\nparser: cannot find {htmlfile}")
+                continue
+
+            filename = document["name"] + ".txt"
+            filedir = os.path.join(CORPUS_DIR, filename)
+
+            print(f"\nparser: parsing {htmlfile}.")
+            title, body = parse(htmlfile)
+
+            if title and body:
+                text = f"{title}\n{body}"
+                print(f"parser: write document {filedir}")
+                write(filedir, text)
+
+                document['title'] = title
+                document['docfile'] = filedir
+                corpus_metadata.append(document)
+            else:
+                print(f"parser: cannot parse {htmlfile}.")
+
+        f.close()
+
+    print("\nparser: update corpus metadata.")
+    with open(CORPUS_METADATA, "w") as f:
+        json.dump(corpus_metadata, f, indent=4)
+        f.close()

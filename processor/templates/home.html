@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>DfnG - Homepage</title>
+    <style>
+      body {
+        margin: 0;
+        position: absolute;
+        top: 35%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Definitely not Google</h1>
+    <form method="POST">
+      <label for="search-bar">Search:</label>
+      <input id="search-bar" placeholder="Search..." name="q" />
+      <br />
+      <br />
+      <label for="top-k">Top-K:</label>
+      <input id="top-k" placeholer="Top K" name="k" type="number" value="10" />
+      <br />
+      <br />
+      <input type="submit" value="Search" />
+    </form>
+  </body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>DfnG - Search result</title>
+    <style>
+      header {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+        border-bottom: 1px solid black;
+        padding: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Definitely not Google</h1>
+      <form method="POST">
+        <label for="search-bar">Search:</label>
+        <input
+          id="search-bar"
+          name="q"
+          placeholder="Search..."
+          value="{{ q }}"
+        />
+        <br />
+        <br />
+        <label for="top-k">Top-K:</label>
+        <input
+          id="top-k"
+          name="k"
+          placeholder="Top K"
+          type="number"
+          value="{{ k }}"
+        />
+        <br />
+        <br />
+        <input type="submit" value="Search" />
+      </form>
+    </header>
+    <p>{{ q }} {{ k }}</p>
+  </body>
+</html>

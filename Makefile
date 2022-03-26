@@ -28,16 +28,26 @@ endif
 		fi
 	python3 -m venv $(VENV)
 	./$(VENV)/bin/pip install -Ur requirements.txt
+	@mkdir data
+	@mkdir data/html
+	@mkdir data/docs
 
+# download and parse html files.
 crawl: crawler/crawler.py crawler/parser.py
 	@echo "running crawler/crawler.py"
 	@./$(VENV)/bin/python3 crawler/crawler.py
 	@echo "running crawler/parser.py"
 	@./$(VENV)/bin/python3 crawler/parser.py
 
-clean_docs:
-	rm -rf crawler/html
-	rm -rf crawler/docs
+# start flask webserver.
+web: processor/website.py processor/templates
+	@echo "running webserver processor/website.py"
+	@./$(VENV)/bin/python3 processor/website.py
+
+clean_crawl:
+	rm data/html/*
+	rm data/docs/*
+	rm data/corpus.json
 
 # clean virtualenv and build.
 clean:

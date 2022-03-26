@@ -1,3 +1,5 @@
 Scrapy == 2.6.1
 flask == 2.0.3
 scikit-learn == 1.0.2
+nltk == 3.7
+pandas == 1.4.1
