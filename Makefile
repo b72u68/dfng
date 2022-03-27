@@ -2,7 +2,7 @@ VENV := venv
 
 # install virtualenv and dependencies.
 # only run when requirements.txt changes.
-install: requirements.txt
+setup: requirements.txt
 ifeq (, $(shell which python3))
 	@echo "[error] missing dependencies: missing python3"
 	@echo "installing python3"
@@ -27,27 +27,37 @@ endif
 			pip3 install virtualenv; \
 		fi
 	python3 -m venv $(VENV)
+	@echo "installing required libraries."
 	./$(VENV)/bin/pip install -Ur requirements.txt
-	@mkdir data
-	@mkdir data/html
-	@mkdir data/docs
+	@echo "running settings script."
+	./$(VENV)/bin/python3 settings.py
 
 # download and parse html files.
 crawl: crawler/crawler.py crawler/parser.py
 	@echo "running crawler/crawler.py"
-	@./$(VENV)/bin/python3 crawler/crawler.py
-	@echo "running crawler/parser.py"
-	@./$(VENV)/bin/python3 crawler/parser.py
+	./$(VENV)/bin/python3 crawler/crawler.py
+	@echo "\nrunning crawler/parser.py"
+	./$(VENV)/bin/python3 crawler/parser.py
+
+# construct inverted index from corpus and write to disk.
+index: indexer/indexer.py
+	@echo "running indexer/indexer.py"
+	./$(VENV)/bin/python3 indexer/indexer.py
 
 # start flask webserver.
 web: processor/website.py processor/templates
 	@echo "running webserver processor/website.py"
-	@./$(VENV)/bin/python3 processor/website.py
+	./$(VENV)/bin/python3 processor/website.py
 
+# clean crawled data
 clean_crawl:
-	rm data/html/*
-	rm data/docs/*
-	rm data/corpus.json
+	rm -rf data/html/*
+	rm -rf data/docs/*
+	rm -rf data/corpus.json
+
+# clean index file
+clean_index:
+	rm -rf index/index.pickle
 
 # clean virtualenv and build.
 clean:
