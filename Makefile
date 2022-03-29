@@ -42,7 +42,7 @@ crawl: crawler/crawler.py crawler/parser.py
 # construct inverted index from corpus and write to disk.
 index: indexer/indexer.py
 	@echo "running indexer/indexer.py"
-	./$(VENV)/bin/python3 indexer/indexer.py
+	./$(VENV)/bin/python3 indexer
 
 # start flask webserver.
 web: processor/website.py processor/templates

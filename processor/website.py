@@ -19,21 +19,29 @@ def home_search():
     return redirect(url_for("search", q=q, k=k))
 
 
-@app.route("/search", methods=["GET", "POST"])
-def search():
+@app.route("/search")
+def search_result():
     if 'q' not in request.args:
         return redirect(url_for("home"))
     q = request.args.get('q').strip()
     if 'k' not in request.args:
         return redirect(url_for("search", q=q, k=10))
     k = int(request.args.get('k').strip())
-    if request.method == "GET":
-        return render_template("result.html", q=q, k=k)
-    elif request.method == "POST":
-        k = int(request.form['k']) if 'k' in request.form else k
-        if 'q' in request.form and request.form['q'].strip():
-            q = request.form['q'].strip()
-        return redirect(url_for("search", q=q, k=k))
+    return render_template("result.html", q=q, k=k)
+
+
+@app.route("/search", methods=["POST"])
+def search():
+    if 'q' not in request.args:
+        return redirect(url_for("home"))
+    q = request.args.get('q').strip()
+    if 'k' not in request.args:
+        return redirect(url_for("search", q=q, k=10))
+    init_k = int(request.args.get('k').strip())
+    k = int(request.form['k']) if 'k' in request.form else init_k
+    if 'q' in request.form and request.form['q'].strip():
+        q = request.form['q'].strip()
+    return redirect(url_for("search", q=q, k=k))
 
 
 if __name__ == "__main__":

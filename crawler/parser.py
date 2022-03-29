@@ -1,13 +1,17 @@
 import os
 import json
 from scrapy.selector import Selector
-from config import CORPUS_DIR, CORPUS_METADATA
+from config import DATA_DIR, CORPUS_DIR, CORPUS_METADATA
 
 BODY_NODES = ['//p//text()', '//ul//text()', '//h2//text()', '//h1//text()',
               '//h3//text()', '//h4//text()', '//h5//text()']
 
 
 class Parser:
+
+    def __init__(self, data_path=DATA_DIR):
+        self.corpus_dir = os.path.join(data_path, CORPUS_DIR)
+        self.metadata_file = os.path.join(data_path, CORPUS_METADATA)
 
     def parse(self, filename):
         try:
@@ -29,11 +33,11 @@ class Parser:
     def run(self):
         corpus_metadata = []
 
-        if not os.path.isfile(CORPUS_METADATA):
+        if not os.path.isfile(self.metadata_file):
             print("\nparser: cannot find corpus metadata file.")
             exit(1)
 
-        with open(CORPUS_METADATA, "r") as f:
+        with open(self.CORPUS_METADATA, "r") as f:
             documents = json.load(f)
             for document in documents:
                 htmlfile = document['htmlfile']
@@ -43,7 +47,7 @@ class Parser:
                     continue
 
                 filename = document["name"] + ".txt"
-                filedir = os.path.join(CORPUS_DIR, filename)
+                filedir = os.path.join(self.corpus_dir, filename)
 
                 print(f"\nparser: parsing {htmlfile}.")
                 title, body = self.parse(htmlfile)
@@ -62,7 +66,7 @@ class Parser:
             f.close()
 
         print("\nparser: update corpus metadata.")
-        with open(CORPUS_METADATA, "w") as f:
+        with open(self.metadata_file, "w") as f:
             json.dump(corpus_metadata, f, indent=4)
             f.close()
 

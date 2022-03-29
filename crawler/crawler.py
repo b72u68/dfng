@@ -4,7 +4,7 @@ from scrapy.crawler import CrawlerProcess
 from scrapy import Request
 from scrapy import Spider
 from config import MAX_PAGES, MAX_DEPTH, URL, BASE_URL
-from config import CORPUS_METADATA, HTML_DIR
+from config import DATA_DIR, HTML_DIR, CORPUS_METADATA
 
 
 class WikiSpider(Spider):
@@ -24,9 +24,14 @@ class WikiSpider(Spider):
     visited_urls = set()
     corpus_metadata = []
 
+    def __init__(self, data_path=DATA_DIR):
+        Spider.__init__(self)
+        self.html_dir = os.path.join(data_path, HTML_DIR)
+        self.metadata_file = os.path.join(data_path, CORPUS_METADATA)
+
     def write_json(self):
         print("crawler: write corpus metadata.")
-        with open(CORPUS_METADATA, "w") as f:
+        with open(self.metadata_file, "w") as f:
             json.dump(self.corpus_metadata, f, indent=4)
             f.close()
 
@@ -40,7 +45,7 @@ class WikiSpider(Spider):
 
             url = response.url
             filename = url.split("/")[-1]
-            filedir = os.path.join(HTML_DIR, filename + ".html")
+            filedir = os.path.join(self.html_dir, filename + ".html")
 
             print(f"crawler: writing html file {filedir}.")
             with open(filedir, 'wb') as f:
@@ -49,7 +54,8 @@ class WikiSpider(Spider):
 
             self.visited_urls.add(url)
             self.corpus_metadata.append({"parent": parent, "name": filename,
-                                         "htmlfile": filedir, "url": url})
+                                         "title": "", "url": url,
+                                         "htmlfile": filedir, "docfile": ""})
 
             for next_page in response.xpath('//p//a/@href').re('/wiki/.+'):
                 next_url = response.urljoin(next_page)
