@@ -1,7 +1,10 @@
 import os
 import json
+import sys
 from scrapy.selector import Selector
-from config import DATA_DIR, CORPUS_DIR, CORPUS_METADATA
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+from config.config import CORPUS_DIR, CORPUS_METADATA
 
 BODY_NODES = ['//p//text()', '//ul//text()', '//h2//text()', '//h1//text()',
               '//h3//text()', '//h4//text()', '//h5//text()']
@@ -9,11 +12,8 @@ BODY_NODES = ['//p//text()', '//ul//text()', '//h2//text()', '//h1//text()',
 
 class Parser:
 
-    def __init__(self, data_path=DATA_DIR):
-        self.corpus_dir = os.path.join(data_path, CORPUS_DIR)
-        self.metadata_file = os.path.join(data_path, CORPUS_METADATA)
-
     def parse(self, filename):
+        print(f"\nparser: parsing {filename}.")
         try:
             file = open(filename)
             selector = Selector(text=file.read())
@@ -26,49 +26,63 @@ class Parser:
             return None, None
 
     def write_doc(self, filename, text):
-        with open(filename, "w") as f:
-            f.write(text)
-            f.close()
+        print(f"parser: write document to {filename}")
+        try:
+            with open(filename, "w") as f:
+                f.write(text)
+                f.close()
+            print(f"parser: successfully updated write document {filename}.")
+        except Exception:
+            print(f"[error] parser: cannot write document {filename}.")
+
+    def write_metadata(self, metadata):
+        print(f"\nparser: update corpus metadata {CORPUS_METADATA}.")
+        try:
+            with open(CORPUS_METADATA, "w") as f:
+                json.dump(metadata, f, indent=4)
+                f.close()
+            print("parser: successfully updated corpus metadata.")
+        except Exception:
+            print("[error] parser: cannot update corpus metadata.")
 
     def run(self):
         corpus_metadata = []
 
-        if not os.path.isfile(self.metadata_file):
+        if not os.path.isfile(CORPUS_METADATA):
             print("\nparser: cannot find corpus metadata file.")
             exit(1)
 
-        with open(self.CORPUS_METADATA, "r") as f:
-            documents = json.load(f)
-            for document in documents:
-                htmlfile = document['htmlfile']
+        try:
+            with open(CORPUS_METADATA, "r") as f:
+                documents = json.load(f)
+                for document in documents:
+                    htmlfile = document['htmlfile']
 
-                if not os.path.isfile(htmlfile):
-                    print(f"\nparser: cannot find {htmlfile}")
-                    continue
+                    if not os.path.isfile(htmlfile):
+                        print(f"\nparser: cannot find {htmlfile}")
+                        continue
 
-                filename = document["name"] + ".txt"
-                filedir = os.path.join(self.corpus_dir, filename)
+                    filename = document["name"] + ".txt"
+                    filedir = os.path.join(CORPUS_DIR, filename)
 
-                print(f"\nparser: parsing {htmlfile}.")
-                title, body = self.parse(htmlfile)
+                    title, body = self.parse(htmlfile)
 
-                if title and body:
-                    text = f"{title}\n{body}"
-                    print(f"parser: write document to {filedir}")
-                    self.write_doc(filedir, text)
+                    if title and body:
+                        text = f"{title}\n{body}"
+                        self.write_doc(filedir, text)
 
-                    document['title'] = title
-                    document['docfile'] = filedir
-                    corpus_metadata.append(document)
-                else:
-                    print(f"parser: cannot parse {htmlfile}.")
+                        document['title'] = title
+                        document['docfile'] = filedir
+                        corpus_metadata.append(document)
+                    else:
+                        print(f"parser: cannot parse {htmlfile}.")
 
-            f.close()
+                f.close()
 
-        print("\nparser: update corpus metadata.")
-        with open(self.metadata_file, "w") as f:
-            json.dump(corpus_metadata, f, indent=4)
-            f.close()
+            self.write_metadata(corpus_metadata)
+
+        except Exception:
+            print("parser: cannot read corpus metadata.")
 
 
 if __name__ == "__main__":

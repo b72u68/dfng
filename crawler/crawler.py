@@ -1,10 +1,13 @@
 import os
+import sys
 import json
 from scrapy.crawler import CrawlerProcess
 from scrapy import Request
 from scrapy import Spider
-from config import MAX_PAGES, MAX_DEPTH, URL, BASE_URL
-from config import DATA_DIR, HTML_DIR, CORPUS_METADATA
+from crawler_config import MAX_PAGES, MAX_DEPTH, URL, BASE_URL
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+from config.config import DATA_DIR, HTML_DIR, CORPUS_METADATA
 
 
 class WikiSpider(Spider):
@@ -30,10 +33,14 @@ class WikiSpider(Spider):
         self.metadata_file = os.path.join(data_path, CORPUS_METADATA)
 
     def write_json(self):
-        print("crawler: write corpus metadata.")
-        with open(self.metadata_file, "w") as f:
-            json.dump(self.corpus_metadata, f, indent=4)
-            f.close()
+        print(f"crawler: write corpus metadata {self.metadata_file}.")
+        try:
+            with open(self.metadata_file, "w") as f:
+                json.dump(self.corpus_metadata, f, indent=4)
+                f.close()
+            print("crawler: successfully write corpus metadata.")
+        except Exception:
+            print("[error] crawler: cannot write corpus metadata.")
 
     def parse(self, response):
         parent = response.meta["parent"] if "parent" in response.meta else ""

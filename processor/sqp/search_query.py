@@ -17,13 +17,10 @@ class SearchQuery(Parser):
     reserved = {
             "AND": "AND",
             "OR": "OR",
-            "NOT": "NOT",
-            "not": "NOT",
-            "and": "AND",
-            "or": "OR"
+            "NOT": "NOT"
     }
 
-    tokens = ["LPAREN", "RPAREN", "TERM"] + list(set(reserved.values()))
+    tokens = ["TERM", "LPAREN", "RPAREN"] + list(reserved.values())
 
     t_LPAREN = r'\('
     t_RPAREN = r'\)'
@@ -31,14 +28,12 @@ class SearchQuery(Parser):
     def t_TERM(self, t):
         r'([a-zA-Z_0-9]|\*)+'
         t.type = self.reserved.get(t.value, "TERM")
-        if t.type != "TERM":
-            t.value = t.value.upper()
         return t
 
     t_ignore = " \t\n\r"
 
     def t_error(self, t):
-        print(f"Illegal character: '{t.value[0]}'")
+        print(f"[error] processor: illegal character: '{t.value[0]}'")
         t.lexer.skip(1)
 
     # Parser
@@ -46,6 +41,14 @@ class SearchQuery(Parser):
             ('left', 'AND', 'OR'),
             ('left', 'NOT')
     )
+
+    def p_phrase_single(self, p):
+        'phrase : TERM'
+        p[0] = ('TERM', p[1])
+
+    def p_phrase_mulitple(self, p):
+        'phrase : TERM phrase'
+        p[0] = ('AND', ('TERM', p[1]), p[2])
 
     def p_query_phrase(self, p):
         'query : phrase'
@@ -67,16 +70,8 @@ class SearchQuery(Parser):
         'query : LPAREN query RPAREN'
         p[0] = p[2]
 
-    def p_phrase_single(self, p):
-        'phrase : TERM'
-        p[0] = ("TERM", p[1])
-
-    def p_phrase_mulitple(self, p):
-        'phrase : TERM phrase'
-        p[0] = ('AND', ("TERM", p[1]), p[2])
-
     def p_error(self, p):
         if p:
-            print(f"Syntax error at '{p.value}'")
+            print(f"[error] processor: syntax error at '{p.value}'")
         else:
-            print("Syntax error at EOF")
+            print("[error] processor: syntax error at EOF")

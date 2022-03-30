@@ -7,24 +7,21 @@ Rule 1     query -> phrase
 Rule 2     query -> query AND query
 Rule 3     query -> query OR query
 Rule 4     query -> NOT query
-Rule 5     query -> LPAREN query RPAREN
-Rule 6     phrase -> TERM
-Rule 7     phrase -> TERM phrase
+Rule 5     phrase -> TERM
+Rule 6     phrase -> TERM phrase
 
 Terminals, with rules where they appear
 
 AND                  : 2
-LPAREN               : 5
 NOT                  : 4
 OR                   : 3
-RPAREN               : 5
-TERM                 : 6 7
+TERM                 : 5 6
 error                : 
 
 Nonterminals, with rules where they appear
 
-phrase               : 1 7
-query                : 2 2 3 3 4 5 0
+phrase               : 1 6
+query                : 2 2 3 3 4 0
 
 Parsing method: LALR
 
@@ -35,13 +32,11 @@ state 0
     (2) query -> . query AND query
     (3) query -> . query OR query
     (4) query -> . NOT query
-    (5) query -> . LPAREN query RPAREN
-    (6) phrase -> . TERM
-    (7) phrase -> . TERM phrase
+    (5) phrase -> . TERM
+    (6) phrase -> . TERM phrase
 
     NOT             shift and go to state 3
-    LPAREN          shift and go to state 4
-    TERM            shift and go to state 5
+    TERM            shift and go to state 4
 
     query                          shift and go to state 1
     phrase                         shift and go to state 2
@@ -52,8 +47,8 @@ state 1
     (2) query -> query . AND query
     (3) query -> query . OR query
 
-    AND             shift and go to state 6
-    OR              shift and go to state 7
+    AND             shift and go to state 5
+    OR              shift and go to state 6
 
 
 state 2
@@ -63,7 +58,6 @@ state 2
     AND             reduce using rule 1 (query -> phrase .)
     OR              reduce using rule 1 (query -> phrase .)
     $end            reduce using rule 1 (query -> phrase .)
-    RPAREN          reduce using rule 1 (query -> phrase .)
 
 
 state 3
@@ -73,87 +67,62 @@ state 3
     (2) query -> . query AND query
     (3) query -> . query OR query
     (4) query -> . NOT query
-    (5) query -> . LPAREN query RPAREN
-    (6) phrase -> . TERM
-    (7) phrase -> . TERM phrase
+    (5) phrase -> . TERM
+    (6) phrase -> . TERM phrase
 
     NOT             shift and go to state 3
-    LPAREN          shift and go to state 4
-    TERM            shift and go to state 5
+    TERM            shift and go to state 4
 
-    query                          shift and go to state 8
+    query                          shift and go to state 7
     phrase                         shift and go to state 2
 
 state 4
 
-    (5) query -> LPAREN . query RPAREN
-    (1) query -> . phrase
-    (2) query -> . query AND query
-    (3) query -> . query OR query
-    (4) query -> . NOT query
-    (5) query -> . LPAREN query RPAREN
-    (6) phrase -> . TERM
-    (7) phrase -> . TERM phrase
+    (5) phrase -> TERM .
+    (6) phrase -> TERM . phrase
+    (5) phrase -> . TERM
+    (6) phrase -> . TERM phrase
 
-    NOT             shift and go to state 3
-    LPAREN          shift and go to state 4
-    TERM            shift and go to state 5
+    AND             reduce using rule 5 (phrase -> TERM .)
+    OR              reduce using rule 5 (phrase -> TERM .)
+    $end            reduce using rule 5 (phrase -> TERM .)
+    TERM            shift and go to state 4
 
-    query                          shift and go to state 9
-    phrase                         shift and go to state 2
+    phrase                         shift and go to state 8
 
 state 5
-
-    (6) phrase -> TERM .
-    (7) phrase -> TERM . phrase
-    (6) phrase -> . TERM
-    (7) phrase -> . TERM phrase
-
-    AND             reduce using rule 6 (phrase -> TERM .)
-    OR              reduce using rule 6 (phrase -> TERM .)
-    $end            reduce using rule 6 (phrase -> TERM .)
-    RPAREN          reduce using rule 6 (phrase -> TERM .)
-    TERM            shift and go to state 5
-
-    phrase                         shift and go to state 10
-
-state 6
 
     (2) query -> query AND . query
     (1) query -> . phrase
     (2) query -> . query AND query
     (3) query -> . query OR query
     (4) query -> . NOT query
-    (5) query -> . LPAREN query RPAREN
-    (6) phrase -> . TERM
-    (7) phrase -> . TERM phrase
+    (5) phrase -> . TERM
+    (6) phrase -> . TERM phrase
 
     NOT             shift and go to state 3
-    LPAREN          shift and go to state 4
-    TERM            shift and go to state 5
+    TERM            shift and go to state 4
 
-    query                          shift and go to state 11
+    query                          shift and go to state 9
     phrase                         shift and go to state 2
 
-state 7
+state 6
 
     (3) query -> query OR . query
     (1) query -> . phrase
     (2) query -> . query AND query
     (3) query -> . query OR query
     (4) query -> . NOT query
-    (5) query -> . LPAREN query RPAREN
-    (6) phrase -> . TERM
-    (7) phrase -> . TERM phrase
+    (5) phrase -> . TERM
+    (6) phrase -> . TERM phrase
 
     NOT             shift and go to state 3
-    LPAREN          shift and go to state 4
-    TERM            shift and go to state 5
+    TERM            shift and go to state 4
 
-    query                          shift and go to state 12
+    query                          shift and go to state 10
     phrase                         shift and go to state 2
 
-state 8
+state 7
 
     (4) query -> NOT query .
     (2) query -> query . AND query
@@ -162,34 +131,21 @@ state 8
     AND             reduce using rule 4 (query -> NOT query .)
     OR              reduce using rule 4 (query -> NOT query .)
     $end            reduce using rule 4 (query -> NOT query .)
-    RPAREN          reduce using rule 4 (query -> NOT query .)
 
-  ! AND             [ shift and go to state 6 ]
-  ! OR              [ shift and go to state 7 ]
+  ! AND             [ shift and go to state 5 ]
+  ! OR              [ shift and go to state 6 ]
+
+
+state 8
+
+    (6) phrase -> TERM phrase .
+
+    AND             reduce using rule 6 (phrase -> TERM phrase .)
+    OR              reduce using rule 6 (phrase -> TERM phrase .)
+    $end            reduce using rule 6 (phrase -> TERM phrase .)
 
 
 state 9
-
-    (5) query -> LPAREN query . RPAREN
-    (2) query -> query . AND query
-    (3) query -> query . OR query
-
-    RPAREN          shift and go to state 13
-    AND             shift and go to state 6
-    OR              shift and go to state 7
-
-
-state 10
-
-    (7) phrase -> TERM phrase .
-
-    AND             reduce using rule 7 (phrase -> TERM phrase .)
-    OR              reduce using rule 7 (phrase -> TERM phrase .)
-    $end            reduce using rule 7 (phrase -> TERM phrase .)
-    RPAREN          reduce using rule 7 (phrase -> TERM phrase .)
-
-
-state 11
 
     (2) query -> query AND query .
     (2) query -> query . AND query
@@ -198,13 +154,12 @@ state 11
     AND             reduce using rule 2 (query -> query AND query .)
     OR              reduce using rule 2 (query -> query AND query .)
     $end            reduce using rule 2 (query -> query AND query .)
-    RPAREN          reduce using rule 2 (query -> query AND query .)
 
-  ! AND             [ shift and go to state 6 ]
-  ! OR              [ shift and go to state 7 ]
+  ! AND             [ shift and go to state 5 ]
+  ! OR              [ shift and go to state 6 ]
 
 
-state 12
+state 10
 
     (3) query -> query OR query .
     (2) query -> query . AND query
@@ -213,18 +168,7 @@ state 12
     AND             reduce using rule 3 (query -> query OR query .)
     OR              reduce using rule 3 (query -> query OR query .)
     $end            reduce using rule 3 (query -> query OR query .)
-    RPAREN          reduce using rule 3 (query -> query OR query .)
 
-  ! AND             [ shift and go to state 6 ]
-  ! OR              [ shift and go to state 7 ]
-
-
-state 13
-
-    (5) query -> LPAREN query RPAREN .
-
-    AND             reduce using rule 5 (query -> LPAREN query RPAREN .)
-    OR              reduce using rule 5 (query -> LPAREN query RPAREN .)
-    $end            reduce using rule 5 (query -> LPAREN query RPAREN .)
-    RPAREN          reduce using rule 5 (query -> LPAREN query RPAREN .)
+  ! AND             [ shift and go to state 5 ]
+  ! OR              [ shift and go to state 6 ]
 

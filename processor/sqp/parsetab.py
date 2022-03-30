@@ -6,9 +6,9 @@ _tabversion = '3.10'
 
 _lr_method = 'LALR'
 
-_lr_signature = 'leftANDORleftNOTAND LPAREN NOT OR RPAREN TERMquery : phrasequery : query AND query\n                 | query OR queryquery : NOT queryquery : LPAREN query RPARENphrase : TERMphrase : TERM phrase'
+_lr_signature = 'leftANDORleftNOTAND NOT OR TERMquery : phrasequery : query AND query\n                 | query OR queryquery : NOT queryphrase : TERMphrase : TERM phrase'
     
-_lr_action_items = {'NOT':([0,3,4,6,7,],[3,3,3,3,3,]),'LPAREN':([0,3,4,6,7,],[4,4,4,4,4,]),'TERM':([0,3,4,5,6,7,],[5,5,5,5,5,5,]),'$end':([1,2,5,8,10,11,12,13,],[0,-1,-6,-4,-7,-2,-3,-5,]),'AND':([1,2,5,8,9,10,11,12,13,],[6,-1,-6,-4,6,-7,-2,-3,-5,]),'OR':([1,2,5,8,9,10,11,12,13,],[7,-1,-6,-4,7,-7,-2,-3,-5,]),'RPAREN':([2,5,8,9,10,11,12,13,],[-1,-6,-4,13,-7,-2,-3,-5,]),}
+_lr_action_items = {'NOT':([0,3,5,6,],[3,3,3,3,]),'TERM':([0,3,4,5,6,],[4,4,4,4,4,]),'$end':([1,2,4,7,8,9,10,],[0,-1,-5,-4,-6,-2,-3,]),'AND':([1,2,4,7,8,9,10,],[5,-1,-5,-4,-6,-2,-3,]),'OR':([1,2,4,7,8,9,10,],[6,-1,-5,-4,-6,-2,-3,]),}
 
 _lr_action = {}
 for _k, _v in _lr_action_items.items():
@@ -17,7 +17,7 @@ for _k, _v in _lr_action_items.items():
       _lr_action[_x][_k] = _y
 del _lr_action_items
 
-_lr_goto_items = {'query':([0,3,4,6,7,],[1,8,9,11,12,]),'phrase':([0,3,4,5,6,7,],[2,2,2,10,2,2,]),}
+_lr_goto_items = {'query':([0,3,5,6,],[1,7,9,10,]),'phrase':([0,3,4,5,6,],[2,2,8,2,2,]),}
 
 _lr_goto = {}
 for _k, _v in _lr_goto_items.items():
@@ -27,11 +27,10 @@ for _k, _v in _lr_goto_items.items():
 del _lr_goto_items
 _lr_productions = [
   ("S' -> query","S'",1,None,None,None),
-  ('query -> phrase','query',1,'p_query_phrase','search_query.py',51),
-  ('query -> query AND query','query',3,'p_query_binary','search_query.py',55),
-  ('query -> query OR query','query',3,'p_query_binary','search_query.py',56),
-  ('query -> NOT query','query',2,'p_query_unary','search_query.py',63),
-  ('query -> LPAREN query RPAREN','query',3,'p_query_group','search_query.py',67),
-  ('phrase -> TERM','phrase',1,'p_phrase_single','search_query.py',71),
-  ('phrase -> TERM phrase','phrase',2,'p_phrase_mulitple','search_query.py',75),
+  ('query -> phrase','query',1,'p_query_phrase','search_query.py',43),
+  ('query -> query AND query','query',3,'p_query_binary','search_query.py',47),
+  ('query -> query OR query','query',3,'p_query_binary','search_query.py',48),
+  ('query -> NOT query','query',2,'p_query_unary','search_query.py',55),
+  ('phrase -> TERM','phrase',1,'p_phrase_single','search_query.py',59),
+  ('phrase -> TERM phrase','phrase',2,'p_phrase_mulitple','search_query.py',63),
 ]

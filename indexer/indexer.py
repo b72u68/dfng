@@ -1,11 +1,15 @@
+import os
 import re
+import sys
 import pickle
 from nltk.stem import PorterStemmer
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-from config import INDEXFILE
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+from config.config import INDEXFILE
 
 sw = stopwords.words('english')
 ps = PorterStemmer()

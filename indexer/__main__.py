@@ -1,6 +1,10 @@
+import os
+import sys
 import json
 from indexer import Indexer
-from config import CORPUS_METADATA
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+from config.config import CORPUS_METADATA
 
 if __name__ == "__main__":
     corpus_metadata = []
