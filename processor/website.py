@@ -7,11 +7,14 @@ from flask import render_template
 from flask import request
 from flask import url_for
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-from indexer.indexer import Indexer
+indexer_module = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "indexer"
+)
+sys.path.append(indexer_module)
+from indexer import Indexer
 
 app = Flask(__name__)
-indexer = Indexer()
+INDEXER_OBJ = Indexer()
 
 
 @app.route("/")
@@ -55,7 +58,7 @@ def search():
     init_k = int(request.args.get('k').strip())
     k = int(request.form['k']) if 'k' in request.form else init_k
     if 'q' in request.form:
-        q = request.form['q']
+        q = preprocess_query(request.form['q'])
     return redirect(url_for("search_result", q=q, k=k))
 
 
@@ -66,8 +69,8 @@ def preprocess_query(query):
 
 
 def search_index(query, top_k=10):
-    index = indexer.load_index()
-    query = indexer.tokenize(query)
+    indexer = INDEXER_OBJ.load_index()
+    index = indexer.INVERTED_INDEX
     return indexer.search(index, query, top_k)
 
 

@@ -15,7 +15,7 @@ sw = stopwords.words('english')
 ps = PorterStemmer()
 
 
-class Indexer:
+class Indexer(object):
 
     def __init__(self, indexfile=INDEXFILE):
         self.INDEXFILE = indexfile
@@ -29,10 +29,11 @@ class Indexer:
         return [ps.stem(token) for token in tokens if token not in sw]
 
     def construct_inverted_index(self, documents):
-        documents = sorted(documents, key=lambda d: d['name'])
+        documents = sorted(documents, key=lambda d: d['title'])
         corpus = [open(document['docfile']).read() for document in documents]
         tfidf_vector = self.TFIDF_VECTORIZER.fit_transform(corpus)
         tfidf_vector.raw_documents = documents
+        self.INVERTED_INDEX = tfidf_vector
         return tfidf_vector
 
     def construct_query_vector(self, query):
@@ -48,17 +49,19 @@ class Indexer:
         sorted_result = sorted(enumerate(raw_documents),
                                key=lambda x: cos_sim_vector[x[0]],
                                reverse=True)
-        return sorted_result[:top_k]
+        return [(cos_sim_vector[doc[0]], doc[1])
+                for doc in sorted_result[:top_k]]
 
-    def write_index(self, index):
+    def write_index(self):
         try:
             with open(self.INDEXFILE, 'wb') as f:
-                pickle.dump(index, f, pickle.HIGHEST_PROTOCOL)
+                pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
                 f.close()
             return 0
         except Exception as e:
-            print(e.with_traceback)
-            return 1
+            print('[error] indexer: cannot write index to disk.')
+            print(e)
+            exit(1)
 
     def load_index(self):
         try:
@@ -66,5 +69,7 @@ class Indexer:
                 index = pickle.load(f)
                 f.close()
             return index
-        except Exception:
-            return None
+        except Exception as e:
+            print('[error] indexer: cannot load index from disk.')
+            print(e)
+            exit(1)
