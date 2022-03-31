@@ -1,16 +1,29 @@
 import os
 import json
+import re
 import sys
 from scrapy.selector import Selector
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 from config.config import CORPUS_DIR, CORPUS_METADATA
 
-BODY_NODES = ['//p//text()', '//ul//text()', '//h2//text()', '//h1//text()',
-              '//h3//text()', '//h4//text()', '//h5//text()']
+NODES = [
+    '//p[not(descendant::*[@id="coordinates"]) and not(descendant::style)]//text()',
+    '//ul[not(ancestor::footer) and not(ancestor::div[@id="mw-panel" or @id="mw-navigation" or @role="navigation"])]//text()',
+    '//h1[not(ancestor::div[@id="mw-panel" or @id="mw-navigation"])]//text()',
+    '//h2[not(ancestor::div[@id="mw-panel" or @id="mw-navigation"])]//text()',
+    '//h3[not(ancestor::div[@id="mw-panel" or @id="mw-navigation"])]//text()',
+    '//h4[not(ancestor::div[@id="mw-panel" or @id="mw-navigation"])]//text()',
+    '//h5[not(ancestor::div[@id="mw-panel" or @id="mw-navigation"])]//text()',
+]
 
 
 class Parser:
+
+    def parse_summary(self, selector):
+        raw_summary = ''.join(selector.xpath(NODES[0]).getall()).split('.')[0]
+        summary = re.sub(r'\[(\d+|\w)\]', '', raw_summary.strip("\n")) + "."
+        return summary
 
     def parse(self, filename):
         print(f"\nparser: parsing {filename}.")
@@ -18,13 +31,13 @@ class Parser:
             file = open(filename)
             selector = Selector(text=file.read())
             title = selector.xpath('//title//text()').get()
-            body = ''.join(selector.xpath('|'.join(BODY_NODES)).getall())
-            summary = ''.join(selector.xpath('//p//text()').getall()).split('.')[0] + "."
+            body = ' '.join(selector.xpath('|'.join(NODES)).getall())
+            summary = self.parse_summary(selector)
             file.close()
             return title, body, summary
         except FileNotFoundError as e:
             print(e)
-            return None, None
+            return None, None, None
 
     def write_doc(self, filename, text):
         print(f"parser: write document to {filename}")
@@ -43,8 +56,9 @@ class Parser:
                 json.dump(metadata, f, indent=4)
                 f.close()
             print("parser: successfully updated corpus metadata.")
-        except Exception:
+        except Exception as e:
             print("[error] parser: cannot update corpus metadata.")
+            print(e)
 
     def run(self):
         corpus_metadata = []
@@ -63,12 +77,12 @@ class Parser:
                         print(f"\nparser: cannot find {htmlfile}")
                         continue
 
-                    filename = document["name"] + ".txt"
-                    filedir = os.path.join(CORPUS_DIR, filename)
-
                     title, body, summary = self.parse(htmlfile)
 
-                    if title and body:
+                    if title and body and summary:
+                        filename = title + ".txt"
+                        filedir = os.path.join(CORPUS_DIR, filename)
+
                         text = f"{title}\n{body}"
                         self.write_doc(filedir, text)
 
@@ -83,8 +97,9 @@ class Parser:
 
             self.write_metadata(corpus_metadata)
 
-        except Exception:
+        except Exception as e:
             print("parser: cannot read corpus metadata.")
+            print(e)
 
 
 if __name__ == "__main__":

@@ -6,9 +6,9 @@
       header {
         display: flex;
         flex-direction: row;
-        justify-content: space-around;
+        justify-content: space-between;
         border-bottom: 1px solid black;
-        padding: 10px;
+        padding: 10px 10%;
       }
 
       footer {
@@ -50,6 +50,7 @@
           name="k"
           placeholder="Top K"
           type="number"
+          min="1"
           value="{{ k }}"
         />
         <br />
@@ -58,20 +59,49 @@
       </form>
     </header>
     <div style="padding-left: 10%; padding-right: 10%">
-      {% for doc in result %}
+      {% if corrected_q|length > 0%}
+      <p style="color: red; margin-bottom: 0">
+        Did you mean:
+        <a href="{{url_for('search_result', q=corrected_q, k=k)}}">{{
+          corrected_q
+        }}</a>
+      </p>
+      {% endif %} {% if result|length == 0 and k > 0 %}
+      <div style="padding-top: 20px; padding-bottom: 20px">
+        <p>
+          Your search - <strong>{{ q }}</strong> - did not match any documents.
+        </p>
+        <p>Sugesstions:</p>
+        <ul>
+          <li>Make sure all works are spelled correctly.</li>
+          <li>Try different keywords.</li>
+          <li>Try more general keywords.</li>
+          <li>Try fewer keywords.</li>
+        </ul>
+        <p>
+          <i style="color: gray"
+            >(This is not copied from Google page, I swear!)</i
+          >
+        </p>
+      </div>
+      {% else %} {% for doc in result %}
       <div style="padding-top: 20px; padding-bottom: 20px">
         <div style="display: flex; flex-direction: row; height: auto">
           <h3 style="margin: 0">
             <a href="{{ doc[1]['url'] }}">{{ doc[1]["title"] }}</a>
           </h3>
-          <p style="color: red; padding-left: 5px; margin: 0">
-            {{ doc[0] }}
-          </p>
+          <p style="color: red; padding-left: 5px; margin: 0">[{{ doc[0] }}]</p>
         </div>
-        <p style="color: gray; margin: 0">{{ doc[1]["url"] }}</p>
+        <p style="margin: 0">
+          <a
+            style="text-decoration: none; color: gray"
+            href="{{ doc[1]['url'] }}"
+            >{{ doc[1]["url"] }}</a
+          >
+        </p>
         <p style="margin: 0">{{ doc[1]["summary"] }}</p>
       </div>
-      {% endfor %}
+      {% endfor %} {% endif %}
     </div>
   </body>
   <footer>

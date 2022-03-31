@@ -2,55 +2,53 @@ import os
 import re
 import sys
 import pickle
-from nltk.stem import PorterStemmer
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.metrics.pairwise import cosine_similarity, linear_kernel
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 from config.config import INDEXFILE
 
-sw = stopwords.words('english')
-ps = PorterStemmer()
+SW = stopwords.words('english')
 
 
 class Indexer(object):
 
-    def __init__(self, indexfile=INDEXFILE):
+    def __init__(self, documents=[], indexfile=INDEXFILE):
         self.INDEXFILE = indexfile
         self.TFIDF_VECTORIZER = TfidfVectorizer(input="content",
                                                 strip_accents='ascii',
                                                 tokenizer=self.tokenize)
+        if len(documents):
+            self.documents = sorted(documents, key=lambda d: d['title'])
+            self.INVERTED_INDEX = self.construct_inverted_index(self.documents)
 
     def tokenize(self, document):
-        document = re.sub(r'[^a-zA-Z0-9 ]', ' ', document)
+        document = re.sub(r"\[(\d+|\w)\]", "", document.lower())
+        document = re.sub(r"[^a-zA-Z0-9 ]", " ", document)
         tokens = word_tokenize(document)
-        return [ps.stem(token) for token in tokens if token not in sw]
+        return [t for t in tokens if t not in SW]
 
     def construct_inverted_index(self, documents):
-        documents = sorted(documents, key=lambda d: d['title'])
-        corpus = [open(document['docfile']).read() for document in documents]
+        corpus = [open(d['docfile']).read() for d in documents if d['docfile']]
         tfidf_vector = self.TFIDF_VECTORIZER.fit_transform(corpus)
-        tfidf_vector.raw_documents = documents
-        self.INVERTED_INDEX = tfidf_vector
         return tfidf_vector
 
     def construct_query_vector(self, query):
         return self.TFIDF_VECTORIZER.transform([query])
 
     def calculate_cosine_similarity(self, index, query_vector):
-        return cosine_similarity(index, query_vector)
+        return cosine_similarity(index, query_vector).flatten()
 
     def search(self, index, query, top_k=10):
-        raw_documents = index.raw_documents
         query_vector = self.construct_query_vector(query)
         cos_sim_vector = self.calculate_cosine_similarity(index, query_vector)
-        sorted_result = sorted(enumerate(raw_documents),
+        sorted_result = sorted(enumerate(self.documents),
                                key=lambda x: cos_sim_vector[x[0]],
                                reverse=True)
         return [(cos_sim_vector[doc[0]], doc[1])
-                for doc in sorted_result[:top_k]]
+                for doc in sorted_result[:top_k] if cos_sim_vector[doc[0]] > 0]
 
     def write_index(self):
         try:

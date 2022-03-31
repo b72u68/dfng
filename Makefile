@@ -1,5 +1,7 @@
 VENV := venv
 
+.PHONY: setup crawl index web all
+
 # install virtualenv and dependencies.
 # only run when requirements.txt changes.
 setup: requirements.txt
@@ -45,7 +47,7 @@ index: indexer/indexer.py
 	./$(VENV)/bin/python3 indexer
 
 # start flask webserver.
-web: processor/website.py processor/templates
+web: processor/website.py
 	@echo "running webserver processor/website.py"
 	./$(VENV)/bin/python3 processor/website.py
 
@@ -58,8 +60,14 @@ clean_crawl:
 # clean index file
 clean_index:
 	rm -rf index/index.pickle
+	touch index/index.pickle
 
 # clean virtualenv and build.
 clean:
 	rm -rf venv
 	rm -rf __pycache__
+
+all: crawl index web
+	make crawl
+	make index
+	make web

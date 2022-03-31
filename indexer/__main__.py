@@ -9,14 +9,22 @@ from config.config import CORPUS_METADATA
 if __name__ == "__main__":
     corpus_metadata = []
 
-    with open(CORPUS_METADATA, "r") as f:
-        corpus_metadata = json.load(f)
+    try:
+        with open(CORPUS_METADATA, "r") as f:
+            corpus_metadata = json.load(f)
+            f.close()
 
-    indexer = Indexer()
+        if not corpus_metadata:
+            print("[error] indexer: cannot load corpus metadata.")
+            exit(1)
 
-    print("indexer: construct inverted index.")
-    indexer.construct_inverted_index(corpus_metadata)
+        indexer = Indexer(documents=corpus_metadata)
 
-    print("indexer: write index to disk.")
-    indexer.write_index()
-    print("indexer: write index successfully.")
+        print("indexer: write index to disk.")
+        indexer.write_index()
+        print("indexer: write index successfully.")
+
+    except Exception as e:
+        print("[error] indexer: cannot load corpus metadata.")
+        print(e)
+        exit(1)

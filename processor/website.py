@@ -6,15 +6,9 @@ from flask import redirect
 from flask import render_template
 from flask import request
 from flask import url_for
-
-indexer_module = os.path.join(
-        os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "indexer"
-)
-sys.path.append(indexer_module)
-from indexer import Indexer
+import processor
 
 app = Flask(__name__)
-INDEXER_OBJ = Indexer()
 
 
 @app.route("/")
@@ -24,54 +18,65 @@ def home():
 
 @app.route("/", methods=["POST"])
 def home_search():
-    q = request.form['q'].strip() if 'q' in request.form else ''
-    q = preprocess_query(q)
-    k = int(request.form['k'].strip()) if 'k' in request.form else 10
-    return redirect(url_for("search_result", q=q, k=k))
+    q = request.form['q'] if 'q' in request.form else ''
+    q = processor.preprocess_query(q)
+
+    if not q:
+        return redirect(url_for("home"))
+
+    if 'k' not in request.form:
+        return redirect(url_for("home"))
+
+    try:
+        k = int(request.form['k'].strip())
+        return redirect(url_for("search_result", q=q, k=k))
+    except Exception:
+        return redirect(url_for("search_result", q=q, k=10))
 
 
 @app.route("/search")
 def search_result():
-    if 'q' not in request.args:
+    q = request.args.get('q') if 'q' in request.args else ''
+    q = processor.preprocess_query(q)
+
+    if not q:
         return redirect(url_for("home"))
 
-    q = request.args.get('q')
     if 'k' not in request.args:
         return redirect(url_for("search_result", q=q, k=10))
 
     try:
         k = int(request.args.get('k').strip())
-        result = search_index(q, k)
-        return render_template("result.html", q=q, k=k, result=result)
     except Exception:
-        result = search_index(q, 10)
-        return render_template("result.html", q=q, k=10, result=result)
+        k = 10
+
+    result = processor.search(q, k)
+    corrected_q = processor.spelling_correction(q)
+    return render_template("result.html", q=q, k=k, result=result,
+                           corrected_q=corrected_q)
 
 
 @app.route("/search", methods=["POST"])
 def search():
-    if 'q' not in request.args or not request.args.get('q').strip():
+    q = request.args.get('q') if 'q' in request.args else ''
+    q = processor.preprocess_query(q)
+
+    if not q:
         return redirect(url_for("home"))
-    q = preprocess_query(request.args.get('q'))
+
     if 'k' not in request.args:
         return redirect(url_for("search_result", q=q, k=10))
-    init_k = int(request.args.get('k').strip())
-    k = int(request.form['k']) if 'k' in request.form else init_k
-    if 'q' in request.form:
-        q = preprocess_query(request.form['q'])
+
+    if 'q' in request.form or not request.form['q'].strip():
+        q = processor.preprocess_query(request.form['q'])
+
+    try:
+        init_k = int(request.args.get('k').strip())
+        k = int(request.form['k']) if 'k' in request.form else init_k
+    except Exception:
+        k = 10
+
     return redirect(url_for("search_result", q=q, k=k))
-
-
-def preprocess_query(query):
-    query = re.sub(r'[\t\n\r]', ' ', query)
-    query = re.sub(r'\s+', ' ', query).strip()
-    return query
-
-
-def search_index(query, top_k=10):
-    indexer = INDEXER_OBJ.load_index()
-    index = indexer.INVERTED_INDEX
-    return indexer.search(index, query, top_k)
 
 
 if __name__ == "__main__":
