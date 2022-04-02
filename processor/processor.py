@@ -13,9 +13,8 @@ INDEXER = Indexer().load_index()
 
 
 def preprocess_query(query):
-    query = re.sub(r'[\t\n\r]', ' ', query)
-    query = re.sub(r'\s+', ' ', query).strip()
-    return query
+    tokens = INDEXER.tokenize(query)
+    return ' '.join(tokens)
 
 
 def spelling_correction(query):
@@ -29,6 +28,7 @@ def spelling_correction(query):
             eds = [(t, nltk.edit_distance(q, t)) for t in index_terms]
             terms[i] = min(eds, key=lambda ed: ed[1])[0]
     return ' '.join(terms) if is_corrected else ''
+
 
 def search(query, top_k=10):
     index = INDEXER.INVERTED_INDEX

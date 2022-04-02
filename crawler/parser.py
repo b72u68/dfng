@@ -30,11 +30,10 @@ class Parser:
         try:
             file = open(filename)
             selector = Selector(text=file.read())
-            title = selector.xpath('//title//text()').get()
             body = ' '.join(selector.xpath('|'.join(NODES)).getall())
             summary = self.parse_summary(selector)
             file.close()
-            return title, body, summary
+            return body, summary
         except FileNotFoundError as e:
             print(e)
             return None, None, None
@@ -77,16 +76,16 @@ class Parser:
                         print(f"\nparser: cannot find {htmlfile}")
                         continue
 
-                    title, body, summary = self.parse(htmlfile)
+                    body, summary = self.parse(htmlfile)
 
-                    if title and body and summary:
+                    if body and summary:
+                        title = document['title']
                         filename = title + ".txt"
                         filedir = os.path.join(CORPUS_DIR, filename)
 
                         text = f"{title}\n{body}"
                         self.write_doc(filedir, text)
 
-                        document['title'] = title
                         document['summary'] = summary
                         document['docfile'] = filedir
                         corpus_metadata.append(document)

@@ -36,14 +36,12 @@ endif
 
 # download and parse html files.
 crawl: crawler/crawler.py crawler/parser.py
-	@echo "running crawler/crawler.py"
-	./$(VENV)/bin/python3 crawler/crawler.py
-	@echo "\nrunning crawler/parser.py"
-	./$(VENV)/bin/python3 crawler/parser.py
+	@echo "running crawler and parser"
+	./$(VENV)/bin/python3 crawler
 
 # construct inverted index from corpus and write to disk.
 index: indexer/indexer.py
-	@echo "running indexer/indexer.py"
+	@echo "running indexer"
 	./$(VENV)/bin/python3 indexer
 
 # start flask webserver.
