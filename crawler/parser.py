@@ -59,6 +59,9 @@ class Parser:
             print("[error] parser: cannot update corpus metadata.")
             print(e)
 
+    def process_filename(self, filename):
+        return re.sub(r'[#%&{}\<>*?/$!\'":@+`|= ]', '', filename)
+
     def run(self):
         corpus_metadata = []
 
@@ -80,7 +83,7 @@ class Parser:
 
                     if body and summary:
                         title = document['title']
-                        filename = title + ".txt"
+                        filename = self.process_filename(title) + ".txt"
                         filedir = os.path.join(CORPUS_DIR, filename)
 
                         text = f"{title}\n{body}"

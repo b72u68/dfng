@@ -40,7 +40,7 @@ class WikiSpider(Spider):
             exit(1)
 
     def process_filename(self, filename):
-        return re.sub(r'[#%&{}\<>*?/ $!\'":@+`|=]', '', filename)
+        return re.sub(r'[#%&{}\<>*?/$!\'":@+`|= ]', '', filename)
 
     def parse(self, response):
         parent = response.meta["parent"] if "parent" in response.meta else ""
