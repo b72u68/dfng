@@ -11,7 +11,7 @@ from indexer import Indexer
 
 class Processor:
 
-    def __init__(self, indexer):
+    def __init__(self):
         self.INDEXER = Indexer().load_index()
 
     def preprocess_query(self, query):
