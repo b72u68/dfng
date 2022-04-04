@@ -8,18 +8,19 @@ indexer_module = os.path.join(
 sys.path.append(indexer_module)
 from indexer import Indexer
 
-INDEXER = Indexer().load_index()
-
 
 class Processor:
 
+    def __init__(self, indexer):
+        self.INDEXER = Indexer().load_index()
+
     def preprocess_query(self, query):
-        tokens = INDEXER.tokenize(query)
+        tokens = self.INDEXER.tokenize(query)
         return ' '.join(tokens)
 
     def spelling_correction(self, query):
         terms = query.split(' ')
-        index_terms = INDEXER.TFIDF_VECTORIZER.get_feature_names_out()
+        index_terms = self.INDEXER.TFIDF_VECTORIZER.get_feature_names_out()
         is_corrected = False
         for i in range(len(terms)):
             q = terms[i]
@@ -30,5 +31,5 @@ class Processor:
         return ' '.join(terms) if is_corrected else ''
 
     def search(self, query, top_k=10):
-        index = INDEXER.INVERTED_INDEX
-        return INDEXER.search(index, query, top_k)
+        index = self.INDEXER.INVERTED_INDEX
+        return self.INDEXER.search(index, query, top_k)
