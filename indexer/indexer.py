@@ -5,7 +5,7 @@ import pickle
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity, linear_kernel
+from sklearn.metrics.pairwise import cosine_similarity
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 from config.config import INDEXFILE
@@ -48,7 +48,7 @@ class Indexer(object):
                                key=lambda x: cos_sim_vector[x[0]],
                                reverse=True)
         return [(cos_sim_vector[doc[0]], doc[1])
-                for doc in sorted_result[:top_k] if cos_sim_vector[doc[0]] > 0]
+                for doc in sorted_result if cos_sim_vector[doc[0]] > 0][:top_k]
 
     def write_index(self):
         try:

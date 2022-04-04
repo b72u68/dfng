@@ -1,14 +1,12 @@
-import os
-import re
-import sys
 from flask import Flask
-from flask import redirect
 from flask import render_template
+from flask import redirect
 from flask import request
 from flask import url_for
-import processor
+from processor import Processor
 
 app = Flask(__name__)
+processor = Processor()
 
 
 @app.route("/")
@@ -80,4 +78,4 @@ def search():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)

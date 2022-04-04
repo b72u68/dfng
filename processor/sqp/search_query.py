@@ -20,10 +20,7 @@ class SearchQuery(Parser):
             "NOT": "NOT"
     }
 
-    tokens = ["TERM", "LPAREN", "RPAREN"] + list(reserved.values())
-
-    t_LPAREN = r'\('
-    t_RPAREN = r'\)'
+    tokens = ["TERM"] + list(reserved.values())
 
     def t_TERM(self, t):
         r'([a-zA-Z_0-9]|\*)+'
@@ -65,10 +62,6 @@ class SearchQuery(Parser):
     def p_query_unary(self, p):
         'query : NOT query'
         p[0] = ('NOT', p[2])
-
-    def p_query_group(self, p):
-        'query : LPAREN query RPAREN'
-        p[0] = p[2]
 
     def p_error(self, p):
         if p:
