@@ -62,8 +62,7 @@ class WikiSpider(Spider):
             self.visited_urls.add(url)
             self.corpus_metadata.append({"parent": parent, "url": url,
                                          "htmlfile": filedir, "docfile": "",
-                                         "title": title, "body": "",
-                                         "summary": ""})
+                                         "title": title, "summary": ""})
             self.write_json()
 
             for next_page in response.xpath('//p//a/@href').re('/wiki/.+'):

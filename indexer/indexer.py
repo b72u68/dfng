@@ -47,8 +47,15 @@ class Indexer(object):
         sorted_result = sorted(enumerate(self.documents),
                                key=lambda x: cos_sim_vector[x[0]],
                                reverse=True)
-        return [(cos_sim_vector[doc[0]], doc[1])
-                for doc in sorted_result if cos_sim_vector[doc[0]] > 0][:top_k]
+        result = []
+        for doc in sorted_result:
+            doc_id = doc[0]
+            if cos_sim_vector[doc_id] > 0:
+                doc_obj = {"parent": doc[1]["parent"], "url": doc[1]["url"],
+                           "title": doc[1]["title"],
+                           "summary": doc[1]["summary"]}
+                result.append((cos_sim_vector[doc_id], doc_obj))
+        return result[:top_k]
 
     def write_index(self):
         try:

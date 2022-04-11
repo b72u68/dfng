@@ -45,9 +45,13 @@ index: indexer/indexer.py
 	./$(VENV)/bin/python3 indexer
 
 # start flask webserver.
-web: processor/website.py
-	@echo "running webserver processor/website.py"
-	./$(VENV)/bin/python3 processor/website.py
+web: processor/backend.py
+	@echo "running webserver processor/backend.py"
+	./$(VENV)/bin/python3 processor/backend.py
+
+# open cli interface
+cli: cli/cli
+	./$(VENV)/bin/python3 cli/cli.py
 
 # clean crawled data
 clean_crawl:
