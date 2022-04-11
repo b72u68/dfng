@@ -49,17 +49,17 @@ web: processor/backend.py
 	@echo "running webserver processor/backend.py"
 	./$(VENV)/bin/python3 processor/backend.py
 
-# open cli interface
+# open cli.
 cli: cli/cli
 	./$(VENV)/bin/python3 cli/cli.py
 
-# clean crawled data
+# clean crawled data.
 clean_crawl:
 	rm -rf data/html/*
 	rm -rf data/docs/*
 	rm -rf data/corpus.json
 
-# clean index file
+# clean index file.
 clean_index:
 	rm -rf index/index.pickle
 	touch index/index.pickle
