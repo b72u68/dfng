@@ -1,6 +1,6 @@
 VENV := venv
 
-.PHONY: setup crawl index web all
+.PHONY: setup crawl index web cli all
 
 # install virtualenv and dependencies.
 # only run when requirements.txt changes.

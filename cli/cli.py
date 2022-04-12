@@ -1,4 +1,5 @@
 import requests
+from time import time
 
 URL = "http://127.0.0.1:5000/search"
 
@@ -33,12 +34,12 @@ while True:
             continue
 
         try:
+            start = time()
             r = requests.get(url=URL, json={"q": q, "k": int(k)})
             data = r.json()
 
             print("\n" + "-"*50)
-
-            print(f"Result for query '{q}':")
+            print(f"\nResult for query '{q}':")
 
             if data["corrected_q"]:
                 print(f"\nSuggested query: '{data['corrected_q']}'")
@@ -59,12 +60,13 @@ while True:
                 print(f"Summary: {doc['summary']}")
                 print(f"Score: {score}")
 
-            print("-"*50)
+            end = time()
+            print("\nTotal search time:", end - start, "s")
+            print("\n" + "-"*50)
 
         except Exception as e:
             print("\n[error] Cannot fetch data from the backend.")
             print(e)
-            print("-"*50)
             continue
 
     except KeyboardInterrupt:

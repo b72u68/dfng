@@ -12,5 +12,5 @@ INDEXFILE = os.path.join(INDEX_DIR, "index.pickle")
 # config for crawler
 SEED_URLS = ["https://en.wikipedia.org/wiki/Compiler"]
 ALLOWED_URLS = ["en.wikipedia.org"]
-MAX_PAGES = 100
-MAX_DEPTH = 10
+MAX_PAGES = 300
+MAX_DEPTH = 2

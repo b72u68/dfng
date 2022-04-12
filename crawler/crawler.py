@@ -16,24 +16,39 @@ class WikiSpider(Spider):
     allowed_domains = ALLOWED_URLS
     start_urls = SEED_URLS
     custom_settings = {
+            # settings AutoThrottle
+            # 'AUTOTHROTTLE_ENABLED': True,
+            # 'AUTOTHROTTLE_TARGET_CONCURRENCY': 2,
+
+            # maximum pagecounts and depth limit
             'CLOSESPIDER_PAGECOUNT': MAX_PAGES,
             'DEPTH_LIMIT': MAX_DEPTH,
+
+            # settings for FIFO crawling
             'DEPTH_PRIORITY': 1,
             'SCHEDULER_DISK_QUEUE': 'scrapy.squeues.PickleFifoDiskQueue',
             'SCHEDULER_MEMORY_QUEUE': 'scrapy.squeues.FifoMemoryQueue',
+
+            # hide logs, only show errors
             'LOG_ENABLE': False,
             'LOG_LEVEL': 'ERROR'
     }
     visited_urls = set()
     corpus_metadata = []
 
+    def __init__(self, verbose=True, *args, **kwargs):
+        super(WikiSpider, self).__init__(*args, **kwargs)
+        self.verbose = verbose
+
     def write_json(self):
-        print(f"crawler: write corpus metadata {CORPUS_METADATA}.")
+        if self.verbose:
+            print(f"crawler: write corpus metadata {CORPUS_METADATA}.")
         try:
             with open(CORPUS_METADATA, "w") as f:
                 json.dump(self.corpus_metadata, f, indent=4)
                 f.close()
-            print("crawler: successfully write corpus metadata.")
+            if self.verbose:
+                print("crawler: successfully write corpus metadata.")
         except Exception as e:
             print("[error] crawler: cannot write corpus metadata.")
             print(e)
@@ -55,7 +70,8 @@ class WikiSpider(Spider):
             filename = self.process_filename(title) + ".html"
             filedir = os.path.join(HTML_DIR, filename)
 
-            print(f"crawler: writing html file {filedir}.")
+            if self.verbose:
+                print(f"crawler: writing html file {filedir}.")
             with open(filedir, 'wb') as f:
                 f.write(response.body)
                 f.close()

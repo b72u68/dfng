@@ -20,13 +20,17 @@ NODES = [
 
 class Parser:
 
+    def __init__(self, verbose=True):
+        self.verbose = verbose
+
     def parse_summary(self, selector):
         raw_summary = ''.join(selector.xpath(NODES[0]).getall()).split('.')[0]
         summary = re.sub(r'\[(\d+|\w)\]', '', raw_summary.strip("\n")) + "."
         return summary
 
     def parse(self, filename):
-        print(f"\nparser: parsing {filename}.")
+        if self.verbose:
+            print(f"\nparser: parsing {filename}.")
         try:
             file = open(filename)
             selector = Selector(text=file.read())
@@ -39,22 +43,26 @@ class Parser:
             return None, None, None
 
     def write_doc(self, filename, text):
-        print(f"parser: write document to {filename}")
+        if self.verbose:
+            print(f"parser: write document to {filename}")
         try:
             with open(filename, "w") as f:
                 f.write(text)
                 f.close()
-            print(f"parser: successfully updated write document {filename}.")
+            if self.verbose:
+                print(f"parser: successfully updated document {filename}.")
         except Exception:
             print(f"[error] parser: cannot write document {filename}.")
 
     def write_metadata(self, metadata):
-        print(f"\nparser: update corpus metadata {CORPUS_METADATA}.")
+        if self.verbose:
+            print(f"\nparser: update corpus metadata {CORPUS_METADATA}.")
         try:
             with open(CORPUS_METADATA, "w") as f:
                 json.dump(metadata, f, indent=4)
                 f.close()
-            print("parser: successfully updated corpus metadata.")
+            if self.verbose:
+                print("parser: successfully updated corpus metadata.")
         except Exception as e:
             print("[error] parser: cannot update corpus metadata.")
             print(e)
@@ -66,7 +74,7 @@ class Parser:
         corpus_metadata = []
 
         if not os.path.isfile(CORPUS_METADATA):
-            print("\nparser: cannot find corpus metadata file.")
+            print("\n[error] parser: cannot find corpus metadata file.")
             exit(1)
 
         try:
@@ -93,14 +101,14 @@ class Parser:
                         document['docfile'] = filedir
                         corpus_metadata.append(document)
                     else:
-                        print(f"parser: cannot parse {htmlfile}.")
+                        print(f"[error] parser: cannot parse {htmlfile}.")
 
                 f.close()
 
             self.write_metadata(corpus_metadata)
 
         except Exception as e:
-            print("parser: cannot read corpus metadata.")
+            print("[error] parser: cannot read corpus metadata.")
             print(e)
 
 
