@@ -19,7 +19,7 @@ def search():
         data = {"message": "invalid search query"}
         return json.dumps(data)
 
-    if type(k) == 'str' and not k.isdigit():
+    if isinstance(k, str) and not k.isnumeric():
         data = {"message": "invalid top-K value"}
         return json.dumps(data)
 

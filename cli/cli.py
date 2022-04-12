@@ -28,7 +28,7 @@ while True:
         if not k.strip():
             k = 10
 
-        if type(k) == "str" and not k.isnumeric():
+        if isinstance(k, str) and not k.isnumeric():
             print("Invalid Top-K value.")
             continue
 
