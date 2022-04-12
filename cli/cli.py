@@ -1,4 +1,3 @@
-import sys
 import requests
 
 URL = "http://127.0.0.1:5000/search"
@@ -44,6 +43,10 @@ while True:
             if data["corrected_q"]:
                 print(f"\nSuggested query: '{data['corrected_q']}'")
 
+            if "result" not in data:
+                print(f"\n[error] {data['message']}")
+                continue
+
             if not len(data["result"]):
                 print(f"\nYour search - '{q}' - did not match any documents.")
                 continue
@@ -66,4 +69,4 @@ while True:
 
     except KeyboardInterrupt:
         print("\n\nExiting dfng. Thank you for searching!")
-        sys.exit(0)
+        exit(0)

@@ -53,6 +53,10 @@ web: processor/backend.py
 cli: cli/cli.py
 	@./$(VENV)/bin/python3 cli/cli.py
 
+# test crawler and parser
+test_crawl:
+	@./$(VENV)/bin/python3 crawler/test.py
+
 # clean crawled data.
 clean_crawl:
 	rm -rf data/html/*
@@ -62,7 +66,6 @@ clean_crawl:
 # clean index file.
 clean_index:
 	rm -rf index/index.pickle
-	touch index/index.pickle
 
 # clean virtualenv and build.
 clean:

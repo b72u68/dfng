@@ -2,6 +2,7 @@ import os
 import re
 import sys
 import pickle
+import unicodedata
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -25,6 +26,8 @@ class Indexer(object):
             self.INVERTED_INDEX = self.construct_inverted_index(self.documents)
 
     def tokenize(self, document):
+        document = unicodedata.normalize('NFKD', document) \
+                              .encode('ascii', 'ignore').decode()
         document = re.sub(r"\[(\d+|\w)\]", "", document.lower())
         document = re.sub(r"[^a-zA-Z0-9 ]", " ", document)
         tokens = word_tokenize(document)

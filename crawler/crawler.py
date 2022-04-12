@@ -43,6 +43,7 @@ class WikiSpider(Spider):
         return re.sub(r'[#%&{}\<>*?/$!\'":@+`|= ]', '', filename)
 
     def parse(self, response):
+        depth = response.meta["depth"] if "depth" in response.meta else 0
         parent = response.meta["parent"] if "parent" in response.meta else ""
 
         if response.status != 404:
@@ -60,9 +61,10 @@ class WikiSpider(Spider):
                 f.close()
 
             self.visited_urls.add(url)
-            self.corpus_metadata.append({"parent": parent, "url": url,
-                                         "htmlfile": filedir, "docfile": "",
-                                         "title": title, "summary": ""})
+            self.corpus_metadata.append({"parent": parent, "depth": depth,
+                                         "url": url, "htmlfile": filedir,
+                                         "docfile": "", "title": title,
+                                         "summary": ""})
             self.write_json()
 
             for next_page in response.xpath('//p//a/@href').re('/wiki/.+'):
@@ -70,4 +72,5 @@ class WikiSpider(Spider):
                 if next_url not in self.visited_urls:
                     request = Request(next_url, callback=self.parse)
                     request.meta["parent"] = url
+                    request.meta["depth"] = depth + 1
                     yield request
