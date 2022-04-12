@@ -44,6 +44,12 @@ To run all components in one command, run the following script:
 $ make all
 ```
 
+Start search cli:
+
+```
+$ make cli
+```
+
 ## Cleaning system data
 
 Clean all the HTML files and document corpus from running the crawler.

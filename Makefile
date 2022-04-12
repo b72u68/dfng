@@ -50,8 +50,8 @@ web: processor/backend.py
 	./$(VENV)/bin/python3 processor/backend.py
 
 # open cli.
-cli: cli/cli
-	./$(VENV)/bin/python3 cli/cli.py
+cli: cli/cli.py
+	@./$(VENV)/bin/python3 cli/cli.py
 
 # clean crawled data.
 clean_crawl:

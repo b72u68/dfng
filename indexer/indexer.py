@@ -48,8 +48,10 @@ class Indexer(object):
                                key=lambda x: cos_sim_vector[x[0]],
                                reverse=True)
         result = []
-        for doc in sorted_result:
+        for i, doc in enumerate(sorted_result):
             doc_id = doc[0]
+            if i == top_k:
+                break
             if cos_sim_vector[doc_id] > 0:
                 doc_obj = {"parent": doc[1]["parent"], "url": doc[1]["url"],
                            "title": doc[1]["title"],
